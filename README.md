@@ -11,3 +11,11 @@ Mac address - 00:d8:61:4d:d2:94
 Processor - Intel64 Family 6 Model 158 Stepping 10, GenuineIntel 
 Ram - 8 GB
 ```
+
+OpenCL.py - класс для сравнения вычислительной мощность GPU и CPU  
+Пример вывода класса:
+```text
+CPU Time: 49.049052 s
+GPU Time: 0.00190783 s
+GPU Kernel evaluation Time: 0.00014396 s
+```
