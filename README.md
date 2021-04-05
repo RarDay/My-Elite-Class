@@ -19,3 +19,12 @@ CPU Time: 49.049052 s
 GPU Time: 0.00190783 s
 GPU Kernel evaluation Time: 0.00014396 s
 ```
+
+Find_Uniq.py - класс для сравнения того на сколько уникальны строки
+Пример вывода класса:
+```text
+s1 = "ABCD ABCD"
+s2 = "DCBA ABCD"
+FuzzyWuzzy - 67%
+Levenshtein - 92.5%
+```
