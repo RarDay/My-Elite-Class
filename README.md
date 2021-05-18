@@ -28,3 +28,6 @@ s2 = "DCBA ABCD"
 FuzzyWuzzy - 67%
 Levenshtein - 92.5%
 ```
+
+Сравнение нейронок 
+![image](https://user-images.githubusercontent.com/57527303/118654149-eb247080-b7f0-11eb-84b7-6c5aade5d1b5.png)
