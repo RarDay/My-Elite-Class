@@ -1,31 +1,75 @@
 Для Лёхи:
 ```python
-import realsense2 as rs
+import pyrealsense2 as rs
+import open3d
+import numpy as np
 
-pipeline = rs.pipeline()  # Объект содержит методы для взаимодействия с потоком
-config = rs.config()  # Дополнительный объект для хранения настроек потока
-config.enable_stream(rs.stream.depth, rs.format.z16, 30)  # Включаем камеры глубины
-# config.enable_stream(rs.stream.color, rs.format.bgr8, 30) # Включаем rgb камеру (пока не нужна) 
-pipeline.start(config)
-align_to = rs.stream.color
-align = rs.align(align_to)
 
-try:
+class OnlineFace:
+    def __init__(self, distance_in_meters):
+        self.flip_transform = [[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]
+        self.distance_in_meters = distance_in_meters
 
-    aligned_frames = align.process(frames)
+    def vis_point(self):
+        ''' Начинаем работу с облаком точек '''
+        align, pipeline = self.camera_config()
 
-    aligned_depth_frame = aligned_frames.get_depth_frame()
-    depth_frame = aligned_frames.get_depth_frame()
+        try:
+            ''' Врубаем все 3 объектива у камеры '''
+            # ToDo вызывать ожидание 1 раз при запуске программы
+            for i in range(25):
+                frames = pipeline.wait_for_frames()
+            aligned_frames = align.process(frames)
 
-    intrinsic = open3d.camera.PinholeCameraIntrinsic(self.get_intrinsic_matrix(depth_frame))
-    depth_image = open3d.geometry.Image(np.array(aligned_depth_frame.get_data()))
-    dh_image = open3d.geometry.PointCloud.create_from_depth_image(
-        depth_image, intrinsic, depth_scale=1.0 / 0.001, depth_trunc=self.distance_in_meters)
+            aligned_depth_frame = aligned_frames.get_depth_frame()
+            # color_frame = aligned_frames.get_color_frame()
+            depth_frame = aligned_frames.get_depth_frame()
+            intrinsic = open3d.camera.PinholeCameraIntrinsic(self.get_intrinsic_matrix(depth_frame))
 
-    dh_image.transform(self.flip_transform)
+            depth_image = open3d.geometry.Image(np.array(aligned_depth_frame.get_data()))
+            # color_image = open3d.geometry.Image(np.asarray(color_frame.get_data()))
 
-finally:
-    pipeline.stop()
+            ''' Соединяем данные от камеры с IK подсветкой с rgb камерой '''
+            # rgbd_image = open3d.geometry.RGBDImage.create_from_color_and_depth(
+            #     color_image, depth_image, depth_scale=1.0 / 0.001,
+            #     depth_trunc=self.distance_in_meters, convert_rgb_to_intensity=False)
+
+            dh_image = open3d.geometry.PointCloud.create_from_depth_image(
+                depth_image, intrinsic, depth_scale=1.0 / 0.001, depth_trunc=self.distance_in_meters)
+            dh_image.transform(self.flip_transform)
+
+            # temp = open3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, intrinsic)
+            # temp.transform(self.flip_transform)
+            # open3d.visualization.draw_geometries([dh_image])
+
+        finally:
+            pipeline.stop()
+
+        return dh_image.points, 0
+
+    def camera_config(self):
+        ''' Запускаем камеру '''
+        pipeline = rs.pipeline()
+        config = rs.config()
+        config.enable_stream(rs.stream.depth, rs.format.z16, 30)
+        # config.enable_stream(rs.stream.color, rs.format.bgr8, 30)
+        pipeline.start(config)
+        align_to = rs.stream.color
+        align = rs.align(align_to)
+        return align, pipeline
+
+    def get_intrinsic_matrix(self, frame):
+        ''' Не помню зачем делал '''
+        intrinsics = frame.profile.as_video_stream_profile().intrinsics
+        out = open3d.camera.PinholeCameraIntrinsic(1280, 720, intrinsics.fx, intrinsics.fy, intrinsics.ppx, intrinsics.ppy)
+
+        return out
+
+
+if __name__ == '__main__':
+    x = OnlineFace()
+    x.vis_point()
+
 
 ```
 Не для Лёхи.  
