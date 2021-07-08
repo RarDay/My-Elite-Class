@@ -1,3 +1,34 @@
+Для Лёхи:
+```python
+import realsense2 as rs
+
+pipeline = rs.pipeline()  # Объект содержит методы для взаимодействия с потоком
+config = rs.config()  # Дополнительный объект для хранения настроек потока
+config.enable_stream(rs.stream.depth, rs.format.z16, 30)  # Включаем камеры глубины
+# config.enable_stream(rs.stream.color, rs.format.bgr8, 30) # Включаем rgb камеру (пока не нужна) 
+pipeline.start(config)
+align_to = rs.stream.color
+align = rs.align(align_to)
+
+try:
+
+    aligned_frames = align.process(frames)
+
+    aligned_depth_frame = aligned_frames.get_depth_frame()
+    depth_frame = aligned_frames.get_depth_frame()
+
+    intrinsic = open3d.camera.PinholeCameraIntrinsic(self.get_intrinsic_matrix(depth_frame))
+    depth_image = open3d.geometry.Image(np.array(aligned_depth_frame.get_data()))
+    dh_image = open3d.geometry.PointCloud.create_from_depth_image(
+        depth_image, intrinsic, depth_scale=1.0 / 0.001, depth_trunc=self.distance_in_meters)
+
+    dh_image.transform(self.flip_transform)
+
+finally:
+    pipeline.stop()
+
+```
+
 Get_PC_info.py - класс для получения информации о компьютере  
 Пример вывода класса:
 ```text
