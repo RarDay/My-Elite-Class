@@ -1,4 +1,4 @@
-Для Лёхи:
+
 ```python
 import pyrealsense2 as rs
 import open3d
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
 
 ```
-Не для Лёхи.  
+
 Get_PC_info.py - класс для получения информации о компьютере  
 Пример вывода класса:
 ```text
