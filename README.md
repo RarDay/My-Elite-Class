@@ -1,3 +1,12 @@
+Генерация диапазона дат между начальной и конечной (включая их)
+```python
+import datetime as DT
+import pandas as pd
+
+start_d = DT.datetime(2024, 4, 1)
+end_d = DT.datetime(2024, 4, 16)
+dates_list = pd.date_range(min(start_d, end_d), max(start_d, end_d)).strftime('%Y-%m-%d').tolist()
+```
 
 ```python
 import pyrealsense2 as rs
